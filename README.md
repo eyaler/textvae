@@ -1,3 +1,5 @@
+adapted for: Windows, Python 3.6, Theano 1
+
 ####  A Hybrid Convolutional Variational Autoencoder for Text Generation.
 
 Theano code for experiments in the paper [A Hybrid Convolutional Variational Autoencoder for Text Generation](https://arxiv.org/abs/1702.02390).

@@ -28,7 +28,7 @@ def main(z, sample_size, p, lstm_size, mode, alpha):
 
     model = make_model(z, sample_size, p, n_classes, lstm_size, alpha)
     name = "twittervae.charlevel.z_%d.len_%d.p_%.2f.lstmsz_%d.alpha_%.2f" % (z, sample_size, p, lstm_size, alpha)
-    model.load("d:/exp/%s/model.flt" % name)
+    model.load("exp/%s/model.flt" % name)
     model.set_phase(train=False)
 
     start_word = n_classes
