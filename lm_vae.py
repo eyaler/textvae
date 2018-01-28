@@ -28,13 +28,13 @@ def make_model(z, sample_size, dropword_p, n_classes, encdec_layers, charcnn_siz
             BatchNormalization(256, name="bn2", collect=False),
             ReLU(),
             Flatten(),
-            Linear(sample_size / 4 * 256, z * 2, name="fc_encode"),
+            Linear(sample_size // 4 * 256, z * 2, name="fc_encode"),
             Sampler(z),
         ]
         decoder_from_z = [
-            Linear(z, sample_size / 4 * 256, name="fc_decode"),
+            Linear(z, sample_size // 4 * 256, name="fc_decode"),
             ReLU(),
-            Reshape((-1, 256, sample_size / 4, 1)),
+            Reshape((-1, 256, sample_size // 4, 1)),
             Deconvolution1D(256, 128, 3, pad=1, stride=2, name="deconv2"),
             BatchNormalization(128, name="deconv_bn2", collect=False),
             ReLU(),
@@ -66,13 +66,13 @@ def make_model(z, sample_size, dropword_p, n_classes, encdec_layers, charcnn_siz
             BatchNormalization(512, name="bn3"),
             ReLU(),
             Flatten(),
-            Linear(sample_size / 8 * 512, z * 2, name="fc_encode"),
+            Linear(sample_size // 8 * 512, z * 2, name="fc_encode"),
             Sampler(z),
         ]
         decoder_from_z = [
-            Linear(z, sample_size / 8 * 512, name="fc_decode"),
+            Linear(z, sample_size // 8 * 512, name="fc_decode"),
             ReLU(),
-            Reshape((-1, 512, sample_size / 8, 1)),
+            Reshape((-1, 512, sample_size // 8, 1)),
             Deconvolution1D(512, 256, 3, pad=1, stride=2, name="deconv3"),
             BatchNormalization(256, name="deconv_bn3", collect=False),
             ReLU(),
@@ -119,7 +119,7 @@ def make_model(z, sample_size, dropword_p, n_classes, encdec_layers, charcnn_siz
         BatchNormalization(charcnn_size * 2, name="decbnresize"),
         Gated(),
     ]
-    for i in xrange(charcnn_layers):
+    for i in range(charcnn_layers):
         layers.append(HighwayConvolution1d(3, charcnn_size, dilation=1, name="decconv%d" % i))
     layers.extend([
         LayoutCNNToRNN(),
@@ -139,10 +139,10 @@ def main(z, lr, sample_size, p, encdec_layers, charcnn_size, charcnn_layers, alp
     model = make_model(z, sample_size, p, train_db.n_classes, encdec_layers, charcnn_size, charcnn_layers, alpha)
 
     #out = nn.utils.forward(model, train_db, out=model.output(model.input))
-    #print out.shape
+    #print(out.shape)
     #return
 
-    print model.total_params
+    print(model.total_params)
 
     name = "lm.charvae.z_%d.len_%d.layers_%d.p_%.2f.alpha_%.2f.charcnnsize_%d.charcnnlayers_%d" % \
            (z, sample_size, encdec_layers, p, alpha, charcnn_size, charcnn_layers)

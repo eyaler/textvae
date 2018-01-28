@@ -24,7 +24,7 @@ class BatchNormalization(object):
             self.extra_params = [self.mean, self.inv_std]
 
     def __call__(self, x):
-        axes = range(x.ndim)
+        axes = list(range(x.ndim))
         axes.remove(self.axis)
         axes = tuple(axes)
         input_mean = x.mean(axes)
@@ -83,7 +83,7 @@ class LayerNormalization(object):
         mean = x.mean(1, keepdims=True)
         inv_std = T.inv(T.sqrt(x.var(1, keepdims=True) + self.epsilon))
 
-        pattern = ['x', 0] + ['x' for _ in xrange(x.ndim - 2)]
+        pattern = ['x', 0] + ['x' for _ in range(x.ndim - 2)]
         beta = self.beta.dimshuffle(tuple(pattern))
         gamma = self.gamma.dimshuffle(tuple(pattern))
 

@@ -8,7 +8,7 @@ def main(exp):
 
     n_plots = info.shape[1] - 1
     f, ax = plt.subplots(1, n_plots)
-    for i in xrange(n_plots):
+    for i in range(n_plots):
         x = info[:, 0]
         y = info[:, i+1]
         ax[i].plot(x, y)

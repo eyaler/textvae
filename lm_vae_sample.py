@@ -35,13 +35,13 @@ class LNLSTMStep(object):
 def to_inputs(s, vocab, sample_size):
     assert len(s) <= sample_size
     s = [vocab.by_word(w) for w in s]
-    for i in xrange(sample_size - len(s)):
+    for i in range(sample_size - len(s)):
         s.append(len(vocab.word_to_index))
     return numpy.asarray(s)
 
 
 def main(z, sample_size, p, encdec_layers, lstm_size, pad_string, mode, alpha):
-    vocab = pickle.load(open("data/char_vocab.pkl"))
+    vocab = pickle.load(open("data/char_vocab.pkl"),'rb')
 
     train_db = LmReconstructionDatabase("train", batches_per_epoch=1000, sample_size=sample_size, random_samples=False)
     valid_db = LmReconstructionDatabase("valid", batches_per_epoch=100, sample_size=sample_size, random_samples=False)
@@ -66,7 +66,7 @@ def main(z, sample_size, p, encdec_layers, lstm_size, pad_string, mode, alpha):
         sampled = norm.ppf(xy)
     elif mode == 'vary':
         dim = numpy.random.randint(z)
-        print "dimension %d" % dim
+        print("dimension %d" % dim)
         s = "<unk> caller to a local radio station said cocaine"
         s = to_inputs(s, vocab, sample_size)
         encoder = model.layers[0].branches[0]
@@ -126,7 +126,7 @@ def main(z, sample_size, p, encdec_layers, lstm_size, pad_string, mode, alpha):
 
     words = start_words
     generated = []
-    for i in xrange(sample_size):
+    for i in range(sample_size):
         ins = T.concatenate([from_z[i], onehot(words)], axis=1)
         pred = step(ins)
         words = T.argmax(pred, axis=1)
@@ -143,23 +143,23 @@ def main(z, sample_size, p, encdec_layers, lstm_size, pad_string, mode, alpha):
 
     results = []
 
-    for i in xrange(w.shape[1]):
+    for i in range(w.shape[1]):
         s = [vocab.by_index(idx) for idx in w[:, i]]
         r = ''.join(s)
-        print r
+        print(r)
         results.append(r)
 
     if mode == 'manifold':
         lines = 3
         steps = int(numpy.sqrt(n))
-        for i in xrange(steps):
-            for k in xrange(lines):
-                for j in xrange(steps):
+        for i in range(steps):
+            for k in range(lines):
+                for j in range(steps):
                     r = results[i * steps + j]
                     l = len(r) / lines
-                    print r[k*l:(k+1)*l], '  ',
-                print
-            print
+                    print(r[k*l:(k+1)*l], '  ',end=' ')
+                print()
+            print()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

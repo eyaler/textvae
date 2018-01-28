@@ -15,7 +15,7 @@ class TwitterReconstructionDatabase(object):
         self.vocab.add('<pad>')
         self.vocab.add('<unk>')
         self.vocab.add('<end>')
-        for i in xrange(256):
+        for i in range(256):
             ch = chr(i)
             self.vocab.add(ch)
         self.n_classes = len(self.vocab)
@@ -28,7 +28,7 @@ class TwitterReconstructionDatabase(object):
                 if s == "":
                     break
                 s = s.strip().split(" ")
-                for i in xrange(len(s)):
+                for i in range(len(s)):
                     if s[i].startswith('http://'):
                         s[i] = "url"
                     if s[i].startswith('https://'):
@@ -51,7 +51,7 @@ class TwitterReconstructionDatabase(object):
         else:
             self.tweets = self.tweets[:valid_size]
 
-        print "%s: %d tweets, max %d chars" % (phase, len(self.tweets), max_len)
+        print("%s: %d tweets, max %d chars" % (phase, len(self.tweets), max_len))
 
         x = self.make_batch()
         self.shared_x = theano.shared(x)
@@ -61,7 +61,7 @@ class TwitterReconstructionDatabase(object):
     def to_inputs(self, tweet):
         chars = [self.vocab.by_word(ch, oov_word='<unk>') for ch in tweet]
         chars.append(self.vocab.by_word('<end>'))
-        for i in xrange(self.max_len - len(tweet) - 1):
+        for i in range(self.max_len - len(tweet) - 1):
             chars.append(self.vocab.by_word('<pad>'))
         return numpy.asarray(chars)
 
@@ -69,7 +69,7 @@ class TwitterReconstructionDatabase(object):
         batch = numpy.zeros((self.max_len, self.batch_size))
 
         if self.pad:
-            for i in xrange(self.batch_size):
+            for i in range(self.batch_size):
                 idx = numpy.random.randint(len(self.tweets))
                 batch[:, i] = self.to_inputs(self.tweets[idx])
         else:
@@ -98,7 +98,7 @@ class TwitterReconstructionDatabase(object):
         }
 
     def indices(self):
-        for i in xrange(self.total_batches()):
+        for i in range(self.total_batches()):
             x = self.make_batch()
             self.shared_x.set_value(x)
             yield 0

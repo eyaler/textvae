@@ -20,7 +20,7 @@ def make_model(n_classes, charcnn_size, charcnn_layers):
         BatchNormalization(charcnn_size * 2, name="decbnresize"),
         Gated(),
     ]
-    for i in xrange(charcnn_layers):
+    for i in range(charcnn_layers):
         layers.append(HighwayConvolution1d(3, charcnn_size, dilation=1, name="decconv%d" % i))
     layers.extend([
         LayoutCNNToRNN(),
@@ -42,9 +42,9 @@ def main(lr, sample_size, charcnn_size, charcnn_layers):
     model = make_model(n_classes, charcnn_size, charcnn_layers)
 
     out = nn.utils.forward(model, train_db)
-    print out
+    print(out)
 
-    print model.total_params
+    print(model.total_params)
 
     name = "charcnn.len_%d.charcnnsize_%d.charcnnlayers_%d" % (sample_size, charcnn_size, charcnn_layers)
 

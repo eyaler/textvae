@@ -5,7 +5,7 @@ import time
 import datetime
 import os
 import shutil
-import utils
+import nn.utils
 
 
 class Optimizer:
@@ -30,10 +30,10 @@ class Optimizer:
 
         self.orig_costs_len = len(train_costs)
 
-        print "computing grads...",
+        print("computing grads...",end=' ')
         t = time.time()
         self.grads = T.grad(train_costs[0], self.params, disconnected_inputs=disconnected_inputs)
-        print "took %f seconds" % (time.time() - t)
+        print("took %f seconds" % (time.time() - t))
 
         if print_info:
             params_l2 = T.sqrt(sum([T.sum(p ** 2) for p in self.params]))
@@ -55,22 +55,22 @@ class Optimizer:
                 train_costs.extend(info)
         except AttributeError:
             pass
-        print "compiling train fn...",
+        print("compiling train fn...", end=' ')
         t = time.time()
         self.train_net = theano.function([train_db.index],
                                          train_costs,
                                          givens=train_db.givens(model.input, model.target),
                                          updates=updates)
-        print "took %f seconds" % (time.time() - t)
+        print("took %f seconds" % (time.time() - t))
 
-        print "compiling valid fn...",
+        print("compiling valid fn...", end=' ')
         t = time.time()
         test_costs, test_updates = model.build(train=False)
         self.test_net = theano.function([self.valid_db.index],
                                         test_costs,
                                         givens=self.valid_db.givens(model.input, model.target),
                                         updates=test_updates)
-        print "took %f seconds" % (time.time() - t)
+        print("took %f seconds" % (time.time() - t))
 
         if restore:
             self.restore_state()
@@ -98,20 +98,20 @@ class Optimizer:
     def restore_state(self):
         if self.name is not None:
             model_filename = "%s/model.flt" % self.opt_folder
-            print "loading %s..." % model_filename,
+            print("loading %s..." % model_filename,end=' ')
             if os.path.exists(model_filename):
                 self.model.load(model_filename, silent=True)
             else:
                 raise Exception("can not restore model from %s, file not found" % model_filename)
-            print "ok"
+            print("ok")
 
             vars_filename = "%s/vars.flt" % self.opt_folder
-            print "loading %s..." % vars_filename,
+            print("loading %s..." % vars_filename,end=' ')
             if os.path.exists(vars_filename):
                 utils.load_update_vars(self.param_updates, vars_filename)
             else:
                 raise Exception("can not restore vars from %s, file not found" % vars_filename)
-            print "ok, lr = %f" % self.param_updates.lr.get_value()
+            print("ok, lr = %f" % self.param_updates.lr.get_value())
 
     def make_files(self, folder_per_exp):
         if self.print_info:
@@ -125,7 +125,7 @@ class Optimizer:
 
             if os.path.exists(self.opt_folder) is False:
                 os.makedirs(self.opt_folder)
-            print "current folder %s" % self.opt_folder
+            print("current folder %s" % self.opt_folder)
 
             mode = "a" if self.restore else "w"
             self.train_log_f = open("%s/log.train.csv" % self.opt_folder, mode, 0)
@@ -154,7 +154,7 @@ class Optimizer:
             msg = '%i' % iteration
             for v in costs:
                 msg += ',%f' % v
-            print >>logs[phase], msg
+            print(msg, file=logs[phase])
 
     def train(self, epochs, output_frequency=10, validation_frequency=-1, callback=None,
               lr_decay=1, decay_after=0, decay_every=1, decay_schedule_in_iters=False):
@@ -168,7 +168,7 @@ class Optimizer:
             decay_every *= self.train_db.total_batches()
         if self.restore:
             cur_epoch, total_iteration, best_cost = utils.read_json_as_tuple("%s/opt_state.json" % self.opt_folder, ["cur_epoch", "total_iteration", "best_cost"])
-        for epoch in xrange(cur_epoch, epochs):
+        for epoch in range(cur_epoch, epochs):
             cost = []
             iteration = 0
             self.model.reset()
@@ -183,22 +183,22 @@ class Optimizer:
 
                 if self.print_info:
                     msg = "%d" % total_iteration
-                    for i in xrange(self.orig_costs_len, len(net_outs)):
+                    for i in range(self.orig_costs_len, len(net_outs)):
                         msg += ",%f" % net_outs[i]
-                    print >>self.info_f, msg
+                    print(msg,file=self.info_f)
 
                 done = float(iteration) / self.train_db.total_batches()
                 if (iteration % output_frequency == 0) or (done == 1.):
                     cost = numpy.mean(cost, axis=0)
-                    print '\repoch %03i, %f done, cost = %s, took %f sec. ' % (epoch+1, done, cost, time.time() - t),
+                    print('\repoch %03i, %f done, cost = %s, took %f sec. ' % (epoch+1, done, cost, time.time() - t),end=' ')
                     self.print_to_log("train", total_iteration, cost)
                     cost = []
 
                 if (done == 1.) or ((iteration % validation_frequency == 0) and (validation_frequency != -1)):
-                    print "validation...",
+                    print("validation...",end=' ')
                     cost = self.get_valid_costs(self.valid_db)
 
-                    print "cost =", cost
+                    print("cost =", cost)
                     self.print_to_log("valid", total_iteration, cost)
 
                     best = False
@@ -220,5 +220,5 @@ class Optimizer:
                     if (total_iteration - decay_after) % decay_every == 0:
                         new_lr = (self.param_updates.lr.get_value() * lr_decay).astype(theano.config.floatX)
                         if lr_decay != 1.:
-                            print "new learning rate = %f" % new_lr
+                            print("new learning rate = %f" % new_lr)
                         self.param_updates.lr.set_value(new_lr)

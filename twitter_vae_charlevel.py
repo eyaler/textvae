@@ -38,13 +38,13 @@ def make_model(z, sample_size, dropword_p, n_classes, lstm_size, alpha):
         BatchNormalization(512, name="bn5"),
         ReLU(),
         Flatten(),
-        Linear(sample_size / (2**5) * 512, z * 2, name="fc_encode"),
+        Linear(sample_size // (2**5) * 512, z * 2, name="fc_encode"),
         Sampler(z),
     ]
     decoder_from_z = [
-        Linear(z, sample_size / (2**5) * 512, name="fc_decode"),
+        Linear(z, sample_size // (2**5) * 512, name="fc_decode"),
         ReLU(),
-        Reshape((-1, 512, sample_size / (2**5), 1)),
+        Reshape((-1, 512, sample_size // (2**5), 1)),
         Deconvolution1D(512, 512, 3, pad=1, stride=2, name="deconv5"),
         BatchNormalization(512, name="deconv_bn5"),
         ReLU(),
@@ -109,10 +109,10 @@ def main(z, lr, sample_size, p, lstm_size, alpha):
     model.anneal_end = 60000.
 
     #out = nn.utils.forward(model, train_db, out=model.output(model.input))
-    #print out.shape
+    #print(out.shape)
     #return
 
-    print model.total_params
+    print(model.total_params)
 
     name = "twittervae.charlevel.z_%d.len_%d.p_%.2f.lstmsz_%d.alpha_%.2f" % (z, sample_size, p, lstm_size, alpha)
 

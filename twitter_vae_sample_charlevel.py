@@ -21,14 +21,14 @@ def main(z, sample_size, p, lstm_size, mode, alpha):
     vocab.add('<pad>')
     vocab.add('<unk>')
     vocab.add('<end>')
-    for i in xrange(256):
+    for i in range(256):
         ch = chr(i)
         vocab.add(ch)
     n_classes = len(vocab)
 
     model = make_model(z, sample_size, p, n_classes, lstm_size, alpha)
     name = "twittervae.charlevel.z_%d.len_%d.p_%.2f.lstmsz_%d.alpha_%.2f" % (z, sample_size, p, lstm_size, alpha)
-    model.load("exp/%s/model.flt" % name)
+    model.load("d:/exp/%s/model.flt" % name)
     model.set_phase(train=False)
 
     start_word = n_classes
@@ -37,7 +37,7 @@ def main(z, sample_size, p, lstm_size, mode, alpha):
         n = 7
         sampled = numpy.random.normal(0, 1, (1, z))
         sampled = numpy.repeat(sampled, n * z, axis=0)
-        for dim in xrange(z):
+        for dim in range(z):
             eps = 0.01
             x = numpy.linspace(eps, 1 - eps, num=n)
             x = norm.ppf(x)
@@ -70,9 +70,9 @@ def main(z, sample_size, p, lstm_size, mode, alpha):
         s1 = numpy.random.randint(0, len(valid_db.tweets))
         s2 = numpy.random.randint(0, len(valid_db.tweets))
         s3 = numpy.random.randint(0, len(valid_db.tweets))
-        print valid_db.tweets[s1]
-        print valid_db.tweets[s2]
-        print valid_db.tweets[s3]
+        print(valid_db.tweets[s1])
+        print(valid_db.tweets[s2])
+        print(valid_db.tweets[s3])
         encoder = model.layers[0].branches[0]
         sampler = encoder[-1]
         assert isinstance(sampler, Sampler)
@@ -118,7 +118,7 @@ def main(z, sample_size, p, lstm_size, mode, alpha):
 
     words = start_words
     generated = []
-    for i in xrange(sample_size):
+    for i in range(sample_size):
         ins = T.concatenate([from_z[i], embed(words)], axis=1)
         pred = step(ins)
         words = T.argmax(pred, axis=1)
@@ -127,16 +127,16 @@ def main(z, sample_size, p, lstm_size, mode, alpha):
     generated = T.concatenate(generated, axis=0)
     import time
     t = time.time()
-    print "compiling...",
+    print("compiling...",end=' ')
     f = theano.function([], outputs=generated)
-    print "done, took %f secs" % (time.time() - t)
+    print("done, took %f secs" % (time.time() - t))
     w = f()
 
     results = []
 
     pad = vocab.by_word("<pad>")
     end = vocab.by_word("<end>")
-    for i in xrange(w.shape[1]):
+    for i in range(w.shape[1]):
         s = []
         for idx in w[:, i]:
             if idx == end:
@@ -147,8 +147,8 @@ def main(z, sample_size, p, lstm_size, mode, alpha):
         r = ''.join(s)
         if mode == "vary":
             if i % n == 0:
-                print "dimension %d" % (i / n)
-        print r.strip()
+                print("dimension %d" % (i / n))
+        print(r.strip())
         results.append(r)
 
 if __name__ == '__main__':

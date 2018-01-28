@@ -84,7 +84,7 @@ class BaseModel(object):
 
     def load(self, filename, strict=True, silent=False):
         if not silent:
-            print "loading %s" % filename
+            print("loading %s" % filename)
         flt = utils.FLT(filename)
         params = flt.load()
         self.set_params(params, strict, silent)
@@ -94,7 +94,7 @@ class BaseModel(object):
             if p.name not in params:
                 if strict is False:
                     if silent is False:
-                        print "not found %s" % p.name
+                        print("not found %s" % p.name)
                 continue
             param = params[p.name]
             if param.shape != p.get_value().shape:
@@ -103,8 +103,8 @@ class BaseModel(object):
                     raise Exception(msg)
                 else:
                     if silent is False:
-                        print msg, "- skipping"
+                        print(msg, "- skipping")
             else:
                 p.set_value(param.astype(theano.config.floatX))
                 if silent is False:
-                    print "loaded %s" % p.name
+                    print("loaded %s" % p.name)

@@ -1,7 +1,6 @@
 import numpy
 import theano
 import theano.tensor as T
-import theano.sandbox.cuda.dnn as dnn
 
 from nn.containers import Sequential
 from nn.initializers import Uniform
@@ -39,8 +38,8 @@ class Pooling1d(object):
 
     def __call__(self, x):
         if self.glob:
-            return dnn.dnn_pool(x, (x.shape[2], x.shape[3]), stride=(1, 1), mode=self.mode, pad=(0, 0))
-        return dnn.dnn_pool(x, (self.size, 1), stride=(self.stride, 1), mode=self.mode, pad=(self.pad, 0))
+            return theano.tensor.signal.pool.pool_2d(x, (x.shape[2], x.shape[3]), stride=(1, 1), mode=self.mode, pad=(0, 0))
+        return theano.tensor.signal.pool.pool_2d(x, (self.size, 1), stride=(self.stride, 1), mode=self.mode, pad=(self.pad, 0))
 
 
 class Convolution1d(object):
@@ -56,9 +55,9 @@ class Convolution1d(object):
         if kernel_size == 1:
             self.causal = False
         mask = []
-        for i in xrange(kernel_size / 2):
+        for i in range(kernel_size // 2):
             mask.append(0)
-        for i in xrange(kernel_size / 2 + 1):
+        for i in range(kernel_size // 2 + 1):
             mask.append(1)
 
         mask = numpy.asarray(mask, dtype=theano.config.floatX)
@@ -100,7 +99,7 @@ class ResidualConvolution1d(object):
                             weight_init=weight_init, name=name, keepdims=keepdims),
             BatchNormalization(kernel_number, collect=False, name=name+"_bn"),
             Gated(),
-            Convolution1d(1, input_size, kernel_number / 2,
+            Convolution1d(1, input_size, kernel_number // 2,
                             pad=0, causal=causal, keepdims=keepdims,
                             weight_init=weight_init, name=name + "_1x1"),
         ])
@@ -153,9 +152,9 @@ class Deconvolution1D(object):
         self.causal = causal
         self.output_sz = output_sz
         mask = []
-        for i in xrange(filter_size / 2 + 1):
+        for i in range(filter_size // 2 + 1):
             mask.append(1)
-        for i in xrange(filter_size / 2):
+        for i in range(filter_size // 2):
             mask.append(0)
         mask = numpy.asarray(mask, dtype=theano.config.floatX)
         self.mask = theano.shared(mask)
@@ -177,7 +176,7 @@ class Deconvolution1D(object):
             w = self.W * self.mask.dimshuffle('x', 'x', 0, 'x')
         else:
             w = self.W
-        conved = dnn.dnn_conv(image, w, subsample=(self.stride, 1), border_mode=(self.pad, 0))
+        conved = theano.tensor.nnet.conv2d(image, w, subsample=(self.stride, 1), border_mode=(self.pad, 0))
 
         grad = T.grad(conved.sum(), wrt=image, known_grads={conved: x})
         return grad + self.b.dimshuffle('x', 0, 'x', 'x')

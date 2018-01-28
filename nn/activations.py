@@ -53,9 +53,9 @@ class Gated(object):
 
     def __call__(self, x):
         if self.axis == 1:
-            size = x.shape[1] / 2
+            size = x.shape[1] // 2
             return self.inner_activation(x[:, :size]) * T.nnet.sigmoid(x[:, size:])
         if self.axis == 2:
-            size = x.shape[2] / 2
+            size = x.shape[2] // 2
             return self.inner_activation(x[:, :, :size]) * T.nnet.sigmoid(x[:, :, size:])
         raise Exception("err")

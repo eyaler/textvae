@@ -9,9 +9,9 @@ class LMDatabase:
         self.augment = augment
         self.batch_size = batch_size
         self.phase = phase
-        self.dataset = numpy.load(open("data/lm.%s.npy" % phase))
+        self.dataset = numpy.load(open("data/lm.%s.npy" % phase,'rb'))
         self.vocab_size = max(self.dataset) + 1
-        print "%s: %d items" % (phase, len(self.dataset))
+        print("%s: %d items" % (phase, len(self.dataset)))
         self.sample_size = sample_size
         ins, outs, self.batch_number = self.create_dataset()
         self.ins = theano.shared(ins)
@@ -19,7 +19,7 @@ class LMDatabase:
         self.index = T.iscalar()
 
     def set_data(self, data):
-        print "%s: new data, %d items" % (self.phase, data.shape[0])
+        print("%s: new data, %d items" % (self.phase, data.shape[0]))
         self.dataset = data.copy()
         ins, outs, self.batch_number = self.create_dataset()
         self.ins.set_value(ins)
@@ -54,7 +54,7 @@ class LMDatabase:
         return self.batch_number
 
     def indices(self):
-        for i in xrange(self.batch_number):
+        for i in range(self.batch_number):
             yield i
         if self.augment:
             ins, outs, self.batch_number = self.create_dataset()

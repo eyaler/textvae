@@ -25,7 +25,7 @@ def forward(model, db, train=False, out=None, full=False, upd=None):
 def save_json(filename, data):
     s = json.JSONEncoder().encode(data)
     with open(filename, 'w') as f:
-        print >>f, s
+        print(s,file=f)
 
 
 def read_json(filename):
@@ -52,16 +52,16 @@ class FLT(object):
 
     def save_array(self, data):
         float_data = data.astype(numpy.float32)
-        print >> self.f, "#%d" % data.ndim
-        for i in xrange(data.ndim):
-            print >> self.f, "#%d" % data.shape[i]
-        print >> self.f, "#float"
+        print("#%d" % data.ndim,file=self.f)
+        for i in range(data.ndim):
+            print("#%d" % data.shape[i],file=self.f)
+        print("#float",file=self.f)
         self.f.write(float_data.tostring())
-        print >> self.f
+        print(file=self.f)
 
     def dump(self, params, close=True):
         for p in params:
-            print >> self.f, "#%s" % p
+            print(self.f, "#%s" % p,file=self.f)
             self.save_array(params[p])
         if close:
             self.close()
@@ -69,11 +69,11 @@ class FLT(object):
     def load(self):
         params = {}
         while True:
-            c = self.f.read(1)
+            c = self.f.read(1).decode()
             if c == '':
                 break
             assert c == "#", 'incorrect param name format'
-            name = self.f.readline().strip()
+            name = self.f.readline().decode().strip()
             arr = self.load_array()
             if name not in params:
                 params[name] = arr
@@ -82,32 +82,32 @@ class FLT(object):
         return params
 
     def load_array(self):
-        c = self.f.read(1)
+        c = self.f.read(1).decode()
         assert c == "#", 'incorrect param ndim format'
-        ndim = self.f.readline().strip()
+        ndim = self.f.readline().decode().strip()
         ndim = int(ndim)
         dims = []
-        for i in xrange(ndim):
-            c = self.f.read(1)
+        for i in range(ndim):
+            c = self.f.read(1).decode()
             assert c == "#", 'incorrect param dim format'
-            dim = self.f.readline().strip()
+            dim = self.f.readline().decode().strip()
             dim = int(dim)
             dims.append(dim)
-        dtype = self.f.readline().strip()
+        dtype = self.f.readline().decode().strip()
         assert dtype == "#float", 'incorrect dtype'
         bytes = numpy.prod(dims) * 4
         if ndim == 0:
             bytes = 4
         bytes = self.f.read(bytes)
         arr = numpy.fromstring(bytes, dtype=numpy.float32)
-        c = self.f.read(1)
+        c = self.f.read(1).decode()
         return arr.reshape(dims)
 
     def close(self):
         self.f.close()
 
     def open(self, filename, write=False):
-        mode = 'w' if write else 'r'
+        mode = 'wb' if write else 'rb'
         self.f = open(filename, mode)
 
 
@@ -149,7 +149,7 @@ def update_vars_as_dict(param_updates):
     try:
         _ = param_updates.vars
     except AttributeError:
-        print "update_vars_as_dict: can not find update variables"
+        print("update_vars_as_dict: can not find update variables")
         return {}
 
     v = {}
@@ -171,7 +171,7 @@ def load_update_vars(param_updates, filename):
     try:
         _ = param_updates.vars
     except AttributeError:
-        print "load_update_vars: can not find update variables"
+        print("load_update_vars: can not find update variables")
         return
 
     flt = FLT(filename)
@@ -183,21 +183,21 @@ def load_update_vars(param_updates, filename):
 
 
 def load_bin_vec(fname, words):
-  print "loading", fname
+  print("loading", fname)
   vocab = set(words)
   word_vecs = {}
   with open(fname, "rb") as f:
-    header = f.readline()
+    header = f.readline().decode()
     vocab_size, layer1_size = map(int, header.split())
     binary_len = numpy.dtype('float32').itemsize * layer1_size
-    print 'vocab_size, layer1_size', vocab_size, layer1_size
+    print('vocab_size, layer1_size', vocab_size, layer1_size)
     count = 0
-    for i, line in enumerate(xrange(vocab_size)):
+    for i, line in enumerate(range(vocab_size)):
       if i % 100000 == 0:
-        print '.',
+        print('.',end=' ')
       word = []
       while True:
-        ch = f.read(1)
+        ch = f.read(1).decode()
         if ch == ' ':
             word = ''.join(word)
             break
@@ -208,13 +208,13 @@ def load_bin_vec(fname, words):
         word_vecs[word] = numpy.fromstring(f.read(binary_len), dtype='float32')
       else:
           f.read(binary_len)
-    print "done"
-    print "words found in wor2vec embeddings: ", count
+    print("done")
+    print("words found in wor2vec embeddings: ", count)
     return word_vecs
 
 
 def load_txt_vec(fname, words):
-    print "loading", fname
+    print("loading", fname)
     word_vecs = {}
     vocab = set(words)
     lines_done = 0
@@ -233,9 +233,9 @@ def load_txt_vec(fname, words):
                 word_vecs[line[0]] = vec
             lines_done += 1
             if lines_done % 100 == 0:
-                print "\r%d %d" % (lines_done, words_found),
+                print("\r%d %d" % (lines_done, words_found),end=' ')
 
-    print "done, found %d words" % words_found
+    print("done, found %d words" % words_found)
     return word_vecs
 
 

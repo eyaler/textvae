@@ -52,11 +52,11 @@ def make_model(z, net, sample_size, p, n_classes):
             BatchNormalization(256, name="bn2"),
             ReLU(),
             Flatten(),
-            Linear(sample_size / 4 * 256, z * 2, name="fc_encode"),
+            Linear(sample_size // 4 * 256, z * 2, name="fc_encode"),
             Sampler(z),
-            Linear(z, sample_size / 4 * 256, name="fc_decode"),
+            Linear(z, sample_size // 4 * 256, name="fc_decode"),
             ReLU(),
-            Reshape((-1, 256, sample_size / 4, 1)),
+            Reshape((-1, 256, sample_size // 4, 1)),
             Deconvolution1D(256, 128, 3, pad=1, stride=2, name="deconv2"),
             BatchNormalization(128, name="deconv_bn2"),
             ReLU(),
@@ -108,13 +108,13 @@ def main(z, lr, net, sample_size, p, clip, nokl):
         model.anneal_end = 1e21
 
     #out = nn.utils.forward(model, train_db, out=model.output(model.input))
-    #print out.shape
+    #print(out.shape)
     #return
 
-    print model.total_params
+    print(model.total_params)
 
     if net == "conv":
-        print "not using clipping for conv model"
+        print("not using clipping for conv model")
         clip = 0.0
 
     name = "vae.%d.%s.%d.%.2f.clip_%d.lr_%.4f" % (z, net, sample_size, p, clip, lr)

@@ -19,18 +19,18 @@ class GridSearch(object):
         self.filename = conf["filename"]
         self.gpus = conf["gpus"]
         self.prefix = conf["prefix"] if "prefix" in conf else "-"
-        self.processes = [None for _ in xrange(len(self.gpus))]
+        self.processes = [None for _ in range(len(self.gpus))]
         self.runs = self.get_runs(conf["grid"])
         self.launched_runs = 0
         self.finished_runs = 0
-        print "%d total runs on gpus %s:" % (len(self.runs), self.gpus)
-        for i in xrange(len(self.runs)):
-            print self.runs[i]
+        print("%d total runs on gpus %s:" % (len(self.runs), self.gpus))
+        for i in range(len(self.runs)):
+            print(self.runs[i])
 
     def get_runs(self, grid, idx=0):
         param = grid[idx]
         runs = []
-        for i in xrange(len(param["values"])):
+        for i in range(len(param["values"])):
             run = {param["name"]: param["values"][i]}
             if idx < len(grid) - 1:
                 inner_runs = self.get_runs(grid, idx+1)
@@ -50,7 +50,7 @@ class GridSearch(object):
 
     def wait(self):
         while True:
-            for i in xrange(len(self.gpus)):
+            for i in range(len(self.gpus)):
                 if self.processes[i] is None:
                     if self.launched_runs < len(self.runs):
                         return i
@@ -58,7 +58,7 @@ class GridSearch(object):
                 if self.processes[i].poll() is not None:
                     self.processes[i] = None
                     self.finished_runs += 1
-                    print "%d runs finished" % self.finished_runs
+                    print("%d runs finished" % self.finished_runs)
                     return i
             time.sleep(10)
 
@@ -80,7 +80,7 @@ class GridSearch(object):
         for p in params:
             command.append("%s%s" % (self.prefix, p))
             command.append(str(params[p]))
-        print command
+        print(command)
         return command
 
 

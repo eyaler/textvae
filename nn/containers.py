@@ -58,7 +58,7 @@ class Sequential(object):
                 upd = l.updates
                 for var in upd:
                     if var in res:
-                        print "update for %s already present, overriding" % var.name
+                        print("update for %s already present, overriding" % var.name)
                     res[var] = upd[var]
             except AttributeError:
                 pass
@@ -102,7 +102,7 @@ class Parallel(object):
                 upd = b.updates
                 for var in upd:
                     if var in res:
-                        print "update for %s already present, overriding" % var.name
+                        print("update for %s already present, overriding" % var.name)
                     res[var] = upd[var]
             except AttributeError:
                 pass
@@ -111,7 +111,7 @@ class Parallel(object):
     def __call__(self, x):
         import theano.tensor as T
         y = []
-        for i in xrange(len(self.branches)):
+        for i in range(len(self.branches)):
             if self.shared_input:
                 y.append(self.branches[i](x))
             else:
