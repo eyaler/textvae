@@ -128,10 +128,10 @@ class Optimizer:
             print("current folder %s" % self.opt_folder)
 
             mode = "a" if self.restore else "w"
-            self.train_log_f = open("%s/log.train.csv" % self.opt_folder, mode, 0)
-            self.valid_log_f = open("%s/log.valid.csv" % self.opt_folder, mode, 0)
+            self.train_log_f = open("%s/log.train.csv" % self.opt_folder, mode)
+            self.valid_log_f = open("%s/log.valid.csv" % self.opt_folder, mode)
             if self.print_info:
-                self.info_f = open(self.opt_folder + "/info.csv", "w", buffering=0)
+                self.info_f = open(self.opt_folder + "/info.csv", "w")
 
     def get_valid_costs(self, db):
         test_costs = []
