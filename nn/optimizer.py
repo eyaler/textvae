@@ -5,7 +5,7 @@ import time
 import datetime
 import os
 import shutil
-import nn.utils
+from nn import utils
 
 
 class Optimizer:

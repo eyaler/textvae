@@ -52,16 +52,16 @@ class FLT(object):
 
     def save_array(self, data):
         float_data = data.astype(numpy.float32)
-        print("#%d" % data.ndim,file=self.f)
+        self.f.write(("#%d\n" % data.ndim).encode())
         for i in range(data.ndim):
-            print("#%d" % data.shape[i],file=self.f)
-        print("#float",file=self.f)
+            self.f.write(("#%d\n" % data.shape[i]).encode())
+        self.f.write(("#float\n").encode())
         self.f.write(float_data.tostring())
-        print(file=self.f)
+        self.f.write(("\n").encode())
 
     def dump(self, params, close=True):
         for p in params:
-            print(self.f, "#%s" % p,file=self.f)
+            self.f.write(("#%s\n" % p).encode())
             self.save_array(params[p])
         if close:
             self.close()

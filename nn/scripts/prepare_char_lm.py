@@ -2,7 +2,7 @@ import argparse
 import pickle
 import numpy
 
-from .. import utils
+from nn import utils
 
 dataset = "ptb"
 
